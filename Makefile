@@ -4,7 +4,16 @@ VER = 2.26
 GIT_VER != git describe --always --tags 2>/dev/null || echo unknown
 CPPFLAGS = -D_POSIX_C_SOURCE=200809L -DGIT_VER=\"$(GIT_VER)\" -DVERSION=\"$(VER)\"
 CFLAGS = -std=c99 -Wall -Wextra -Iserver/include -Iexternal -pthread
-SRC = server/*.c external/tinycthread.c
+
+OS_TYPE := $(shell uname -s)
+ifeq ($(OS_TYPE),Linux)
+    SRC = server/*.c
+    LDFLAGS = -lpthread
+else
+    SRC = server/*.c external/tinycthread.c
+    LDFLAGS =
+endif
+
 OUT = parados
 
 # Install Paths
@@ -19,10 +28,10 @@ MAN7DIR ?= $(MANDIR)/man7
 all: release
 
 release:
-	$(CC) $(CPPFLAGS) -DNDEBUG $(CFLAGS) -O2 $(SRC) -o $(OUT)
+	$(CC) $(CPPFLAGS) -DNDEBUG $(CFLAGS) -O2 $(SRC) $(LDFLAGS) -o $(OUT)
 
 debug:
-	$(CC) $(CPPFLAGS) -DDEBUG $(CFLAGS) -g $(SRC) -o $(OUT)
+	$(CC) $(CPPFLAGS) -DDEBUG $(CFLAGS) -g $(SRC) $(LDFLAGS) -o $(OUT)
 
 clean:
 	rm -f $(OUT)
