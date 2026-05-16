@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# shrados
+# shclient
 # A REPL client for parados
 
 set -u
@@ -21,9 +21,9 @@ C_DIR=""
 C_VID=""
 
 CACHE_DIR=${XDG_CACHE_HOME:-"$HOME/.cache"}
-AUTH_FILE="$CACHE_DIR/shrados.auth"
+AUTH_FILE="$CACHE_DIR/shclient.auth"
 
-TMP_DIR=${TMPDIR:-/tmp}/shrados.$$
+TMP_DIR=${TMPDIR:-/tmp}/shclient.$$
 LIB_FILE="$TMP_DIR/library.tsv"
 MAP_FILE="$TMP_DIR/view.tsv"
 
@@ -225,7 +225,7 @@ Commands:
   watch n              play video at ls index using VIDEO_PLAYER
   url URL              set server URL
   pwd                  show current folder
-  quit | exit          leave shrados
+  quit | exit          leave shclient
 EOF2
 }
 
@@ -454,12 +454,12 @@ main()
 	: > "$LIB_FILE"; : > "$MAP_FILE"
 
 	if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then cmd_help; exit 0; fi
-	[ $# -eq 0 ] || die "usage: shrados"
+	[ $# -eq 0 ] || die "usage: shclient"
 
 	load_auth_cache
 	if ! refresh_library; then printf '%s\n' "not logged in. use: login" >&2; fi
 
-	printf '%s\n' "shrados: minimal video repl"
+	printf '%s\n' "shclient: minimal video repl"
 	printf 'server: %s\n' "$PARADOS_URL"
 	printf 'player: %s %s\n' "$VIDEO_PLAYER" "$VIDEO_PLAYER_ARGS"
 	cmd_help
