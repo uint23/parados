@@ -247,53 +247,41 @@ out:
  */
 static const char* mime_from_path(const char* path)
 {
+	static const struct {
+		const char* ext;
+		const char* type;
+	} types[] = {
+		/* audio */
+		{ "mp3",  "audio/mpeg" }, { "m4a",  "audio/mp4" },
+		{ "aac",  "audio/aac" }, { "flac", "audio/flac" },
+		{ "wav",  "audio/wav" }, { "ogg",  "audio/ogg" },
+		{ "opus", "audio/opus" },
+
+		/* video */
+		{ "mp4",  "video/mp4" }, { "mkv",  "video/x-matroska" },
+		{ "webm", "video/webm" }, { "mov",  "video/quicktime" },
+
+		/* images */
+		{ "jpg",  "image/jpeg" }, { "jpeg", "image/jpeg" },
+		{ "png",  "image/png" }, { "gif",  "image/gif" },
+		{ "webp", "image/webp" },
+
+		/* subtitles */
+		{ "vtt", "text/vtt" }, { "srt", "application/x-subrip" },
+
+		/* misc */
+		{ "pdf", "application/pdf" },
+	};
 	const char* dot = strrchr(path, '.');
+
 	if (!dot || dot[1] == '\0')
 		return "application/octet-stream";
 
 	dot++;
 
-	/* audio */
-	if (strcasecmp(dot, "mp3") == 0)
-		return "audio/mpeg";
-	if (strcasecmp(dot, "m4a") == 0)
-		return "audio/mp4";
-	if (strcasecmp(dot, "aac") == 0)
-		return "audio/aac";
-	if (strcasecmp(dot, "flac") == 0)
-		return "audio/flac";
-	if (strcasecmp(dot, "wav") == 0)
-		return "audio/wav";
-	if (strcasecmp(dot, "ogg") == 0)
-		return "audio/ogg";
-	if (strcasecmp(dot, "opus") == 0)
-		return "audio/opus";
-
-	/* video */
-	if (strcasecmp(dot, "mp4") == 0)
-		return "video/mp4";
-	if (strcasecmp(dot, "mkv") == 0)
-		return "video/x-matroska";
-	if (strcasecmp(dot, "webm") == 0)
-		return "video/webm";
-	if (strcasecmp(dot, "mov") == 0)
-		return "video/quicktime";
-
-	/* images */
-	if (strcasecmp(dot, "jpg") == 0)
-		return "image/jpeg";
-	if (strcasecmp(dot, "jpeg") == 0)
-		return "image/jpeg";
-	if (strcasecmp(dot, "png") == 0)
-		return "image/png";
-	if (strcasecmp(dot, "gif") == 0)
-		return "image/gif";
-	if (strcasecmp(dot, "webp") == 0)
-		return "image/webp";
-
-	/* misc */
-	if (strcasecmp(dot, "pdf") == 0)
-		return "application/pdf";
+	for (size_t i = 0; i < sizeof(types) / sizeof(types[0]); i++)
+		if (strcasecmp(dot, types[i].ext) == 0)
+			return types[i].type;
 
 	return "application/octet-stream";
 }
@@ -1040,4 +1028,3 @@ int http_handle(int c)
 
 	return route_dispatch(c, hdr, path, u, head_only);
 }
-
