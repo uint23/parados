@@ -5,9 +5,10 @@ paradosd
 parados
 *.o
 *.swp
+*.dSYM
 ./*.sh
 # clients
 !clients/shrados/*
 clients/gorados/gorados
-*.dSYM
+clients/test/
 
