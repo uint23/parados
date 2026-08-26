@@ -69,12 +69,15 @@ validate_id()
 	esac
 }
 
-# check if path is video based on extension
-is_video_path()
+# check if path has an extension supported by parados
+is_supported_path()
 {
 	p=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
 	case "$p" in
-		*.mkv|*.mp4|*.webm|*.mov|*.m4v|*.avi|*.mpg|*.mpeg|*.ts|*.m2ts|*.flv|*.wmv|*.3gp) return 0 ;;
+		*.mp3|*.m4a|*.aac|*.flac|*.wav|*.ogg|*.opus|\
+		*.mp4|*.mkv|*.webm|*.mov|\
+		*.jpg|*.jpeg|*.png|*.gif|*.webp|\
+		*.vtt|*.srt|*.pdf) return 0 ;;
 		*) return 1 ;;
 	esac
 }
@@ -134,7 +137,7 @@ refresh_library()
 		200)
 			parse_library_json "$tmp" | while IFS="$TAB" read -r id path; do
 				validate_id "$id" || continue
-				is_video_path "$path" || continue
+				is_supported_path "$path" || continue
 				printf '%s\t%s\n' "$id" "$path"
 			done | sort -f -t "$TAB" -k2,2 > "$LIB_FILE" || { printf '%s\n' "failed parsing /library response" >&2; return 1; }
 			;;
