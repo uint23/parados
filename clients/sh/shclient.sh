@@ -114,15 +114,33 @@ http_get()
 parse_library_json()
 {
 	LC_ALL=C awk '
+	BEGIN {
+		FS = "},\\{"
+	}
+
 	{
-		s = $0
-		while (match(s, /"id":"([^"]+)","path":"([^"]*)"/)) {
-			chunk = substr(s, RSTART, RLENGTH)
-			id = chunk; sub(/^"id":"/, "", id); sub(/","path":"[^"]*"$/, "", id)
-			path = chunk; sub(/^"id":"[^"]+","path":"/, "", path); sub(/"$/, "", path)
-			gsub(/\\"/, "\"", path); gsub(/\\t/, "\t", path); gsub(/\\r/, "", path); gsub(/\\n/, "", path)
+		for (i = 1; i <= NF; i++) {
+			chunk = $i
+
+			sub(/^\[\{/, "", chunk)
+			sub(/^\{/, "", chunk)
+			sub(/\}\]$/, "", chunk)
+			sub(/\}$/, "", chunk)
+
+			id = chunk
+			sub(/^"id":"/, "", id)
+			sub(/","path":".*$/, "", id)
+
+			path = chunk
+			sub(/^"id":"[^"]+","path":"/, "", path)
+			sub(/"$/, "", path)
+
+			gsub(/\\"/, "\"", path)
+			gsub(/\\t/, "\t", path)
+			gsub(/\\r/, "", path)
+			gsub(/\\n/, "", path)
+
 			printf "%s\t%s\n", id, path
-			s = substr(s, RSTART + RLENGTH)
 		}
 	}
 	' "$1"
