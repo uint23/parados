@@ -4,7 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "util.h"
+#include "utils.h"
 
 static int ci_key_match(const char* a, const char* b, size_t n);
 

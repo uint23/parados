@@ -5,7 +5,7 @@
 #include "config.h"
 #include "log.h"
 #include "users.h"
-#include "util.h"
+#include "utils.h"
 
 struct users users;
 

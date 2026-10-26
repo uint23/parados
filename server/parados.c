@@ -32,7 +32,7 @@
 #include "http.h"
 #include "log.h"
 #include "scan.h"
-#include "util.h"
+#include "utils.h"
 
 #ifndef GIT_VER
 #define GIT_VER "unknown"

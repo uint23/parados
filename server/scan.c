@@ -11,7 +11,7 @@
 #include "config.h"
 #include "scan.h"
 #include "log.h"
-#include "util.h"
+#include "utils.h"
 
 static uint64_t encode_fnv1a64(const char* s);
 static int library_push(struct library* l, const char* rel);

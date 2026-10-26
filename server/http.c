@@ -19,7 +19,7 @@
 #include "log.h"
 #include "scan.h"
 #include "users.h"
-#include "util.h"
+#include "utils.h"
 
 struct response {
 	const char* status;

@@ -1,5 +1,5 @@
-#ifndef UTIL_H
-#define UTIL_H
+#ifndef UTILS_H
+#define UTILS_H
 
 #include <stddef.h>
 
@@ -59,5 +59,5 @@ void secure_bzero(void* p, size_t n);
  */
 int write_all(int fd, const void* buf, size_t n);
 
-#endif /* UTIL_H */
+#endif /* UTILS_H */
 

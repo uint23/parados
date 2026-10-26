@@ -11,7 +11,7 @@ SRC = server/config.c \
       server/parados.c \
       server/scan.c \
       server/users.c \
-      server/util.c
+      server/utils.c
 
 OUT = parados
 
