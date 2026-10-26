@@ -1,10 +1,12 @@
-# C Stuff
-CC = cc
-VER = 2.26
-GIT_VER != git describe --always --tags 2>/dev/null || echo unknown
+CC  = cc
+VER = 10.26
+
+GIT_VER   != git describe --always --tags 2>/dev/null || echo unknown
 POSIX_DEF != test `uname` != OpenBSD && echo -D_POSIX_C_SOURCE=200809L || :
+
 CPPFLAGS = $(POSIX_DEF) -DGIT_VER=\"$(GIT_VER)\" -DVERSION=\"$(VER)\" $(POSIX_FLAGS)
-CFLAGS = -std=c99 -Wall -Wextra -Iserver/include -pthread
+CFLAGS   = -std=c99 -Wall -Wextra -Iserver/include -pthread
+
 SRC = server/config.c \
       server/http.c \
       server/json.c \
@@ -12,10 +14,15 @@ SRC = server/config.c \
       server/scan.c \
       server/users.c \
       server/utils.c
-
+HDR = server/include/config.h \
+      server/include/http.h \
+      server/include/json.h \
+      server/include/log.h \
+      server/include/scan.h \
+      server/include/users.h \
+      server/include/utils.h
 OUT = parados
 
-# Install Paths
 ETCDIR  = /etc
 PREFIX  = /usr/local
 BINDIR  = $(PREFIX)/bin
@@ -24,12 +31,14 @@ MAN1DIR = $(MANDIR)/man1
 MAN5DIR = $(MANDIR)/man5
 MAN7DIR = $(MANDIR)/man7
 
-all: release
+all: parados
 
-release:
+release: $(OUT)
+
+$(OUT): $(SRC) $(HDR)
 	$(CC) $(CPPFLAGS) -DNDEBUG $(CFLAGS) -O2 $(SRC) -o $(OUT)
 
-debug:
+debug: $(SRC) $(HDR)
 	$(CC) $(CPPFLAGS) -DDEBUG $(CFLAGS) -g $(SRC) -o $(OUT)
 
 clean:
