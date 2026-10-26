@@ -12,7 +12,7 @@ struct users users;
 static int allow_push(struct user* u, const char* s);
 static int b64_decode(unsigned char* out, size_t outsz, const char* in);
 static int b64_val(int c);
-static int ct_equal(const char* a, const char* b);
+static bool ct_equal(const char* a, const char* b);
 static const struct user* find_user(const char* name);
 
 /* Append allow prefix to user entry
@@ -92,8 +92,8 @@ static int b64_val(int c)
 	return -1;
 }
 /* Compare two strings in constant time
-   Returns 1=Equal, 0=Not equal */
-static int ct_equal(const char* a, const char* b)
+   Returns true=Equal, false=Not equal */
+static bool ct_equal(const char* a, const char* b)
 {
 	size_t la = strlen(a);
 	size_t lb = strlen(b);
@@ -122,28 +122,28 @@ static const struct user* find_user(const char* name)
 }
 
 /* Check whether path matches allow prefix
-   Returns 1=Match, 0=No match */
-static int prefix_ok(const char* path, const char* pre)
+   Returns true=Match, false=No match */
+static bool prefix_ok(const char* path, const char* pre)
 {
 	size_t n = strlen(pre);
 	if (n == 0)
-		return 0;
+		return false;
 
 	if (strcmp(pre, "*") == 0)
-		return 1;
+		return true;
 
 	if (strncmp(path, pre, n) != 0)
-		return 0;
+		return false;
 
 	/* allow match or dir boundary */
 	if (path[n] == '\0')
-		return 1;
+		return true;
 	if (pre[n - 1] == '/')
-		return 1;
+		return true;
 	if (path[n] == '/')
-		return 1;
+		return true;
 
-	return 0;
+	return false;
 }
 
 bool user_allows_path(const struct user* u, const char* relpath)

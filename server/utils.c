@@ -1,24 +1,25 @@
 #include <ctype.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
 #include "utils.h"
 
-static int ci_key_match(const char* a, const char* b, size_t n);
+static bool ci_key_match(const char* a, const char* b, size_t n);
 
 /* Compare two header keys case-insensitively
-   Returns 1=Match, 0=No match */
-static int ci_key_match(const char* a, const char* b, size_t n)
+   Returns true=Match, false=No match */
+static bool ci_key_match(const char* a, const char* b, size_t n)
 {
 	for (size_t i = 0; i < n; i++) {
 		unsigned char ca = (unsigned char)a[i];
 		unsigned char cb = (unsigned char)b[i];
 		if (tolower(ca) != tolower(cb))
-			return 0;
+			return false;
 	}
-	return 1;
+	return true;
 }
 
 const char* cistrstr(const char* hay, const char* nee)
