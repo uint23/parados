@@ -62,5 +62,5 @@ a PR.
 > a HTTPS reverse proxy is a good idea
 
 ### Repository Links
-[[GitHub](https://github.com/uint23/parados)] [[SourceHut](https://sr.ht/~uint/parados)]
+[[GitHub](https://github.com/uint23/parados)] [[srcdump](https://srcdump.net/uint/parados)]
 
