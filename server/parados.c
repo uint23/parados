@@ -185,15 +185,15 @@ void run(void)
 			(void)write_all(c, resp, sizeof(resp) - 1);
 
 			close(c);
-			LOG(true, "CORE", "Connection         Busy (503)");
+			LOG_FIELD(true, "CORE", "Connection", "Busy (503)");
 			continue;
 		}
 
-		LOG(verbose_log, "CORE", "Connection         Accepted");
+		LOG_FIELD(verbose_log, "CORE", "Connection", "Accepted");
 		pthread_t t;
 		int err = pthread_create(&t, NULL, client_thread, (void*)(intptr_t)c);
 		if (err != 0) {
-			LOG(true, "CORE", "pthread_create FAILED  %d", err);
+			LOG_FIELD(true, "CORE", "pthread_create FAILED", "%d", err);
 			close(c);
 			release_slot();
 			continue;
@@ -242,13 +242,13 @@ void setup(void)
 
 	if (scan_library(&lib, media_dir) < 0)
 		die("scan_library", EXIT_FAILURE);
-	LOG(verbose_log, "SCAN", "Cached items       %zu", lib.len);
+	LOG_FIELD(verbose_log, "SCAN", "Cached items", "%zu", lib.len);
 
 	ret = listen(sock, LISTEN_BACKLOG);
 	if (ret < 0)
 		die("listen", EXIT_FAILURE);
 
-	LOG(verbose_log, "CORE", "Listening on       %s:%d", server_addr, server_port);
+	LOG_FIELD(verbose_log, "CORE", "Listening on", "%s:%d", server_addr, server_port);
 #ifdef __OpenBSD__
 	if (unveil(media_dir, "r") < 0)
 		die("unveil", EXIT_FAILURE);

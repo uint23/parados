@@ -51,7 +51,7 @@ static int library_push(struct library* l, const char* rel)
 		size_t ncap = l->cap ? (l->cap * 2) : 64;
 		struct item* ni = realloc(l->items, ncap * sizeof(*ni));
 		if (!ni) {
-			LOG(verbose_log, "SCAN", "realloc FAILED     OOM");
+			LOG_FIELD(verbose_log, "SCAN", "realloc FAILED", "OOM");
 			return -1;
 		}
 		l->items = ni;
@@ -95,7 +95,7 @@ static int scan_dir(struct library* l, const char* root, const char* rel)
 
 	d = opendir(full);
 	if (!d) {
-		LOG(verbose_log, "SCAN", "opendir FAILED     %s", full);
+		LOG_FIELD(verbose_log, "SCAN", "opendir FAILED", "%s", full);
 		return -1;
 	}
 

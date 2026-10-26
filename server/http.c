@@ -535,7 +535,7 @@ static void reply(int c, const char* hdr, const struct response* res)
 static int route_dispatch(int c, const char* hdr, const char* path, const struct user* u, int head_only)
 {
 	if (strcmp(path, "/ping") == 0) {
-		LOG(verbose_log, "HTTP", "Route              /ping");
+		LOG_FIELD(verbose_log, "HTTP", "Route", "/ping");
 		reply(c, hdr, &(struct response){ HTTP_200, HTTP_TEXT, NULL, "OK\n", sizeof("OK\n") - 1, 1, 0 });
 		return 0;
 	}
@@ -550,7 +550,7 @@ static int route_dispatch(int c, const char* hdr, const char* path, const struct
 		struct item tmp;
 		char rel[4096];
 
-		LOG(verbose_log, "HTTP", "Route              /stream");
+		LOG_FIELD(verbose_log, "HTTP", "Route", "/stream");
 		tmp.path = rel;
 
 		int rc = route_item_path(&tmp, path, "/stream/", u, c, hdr);
@@ -567,7 +567,7 @@ static int route_dispatch(int c, const char* hdr, const char* path, const struct
 		const char* type;
 		struct json j;
 
-		LOG(verbose_log, "HTTP", "Route              /meta");
+		LOG_FIELD(verbose_log, "HTTP", "Route", "/meta");
 		tmp.path = rel;
 
 		int rc = route_item_path(&tmp, path, "/meta/", u, c, hdr);
@@ -590,7 +590,7 @@ static int route_dispatch(int c, const char* hdr, const char* path, const struct
 		return 0;
 	}
 
-	LOG(verbose_log, "HTTP", "Route not found    %s", path);
+	LOG_FIELD(verbose_log, "HTTP", "Route not found", "%s", path);
 	reply(c, hdr, &(struct response){ HTTP_404, HTTP_TEXT, NULL, "Not Found\n", sizeof("Not Found\n") - 1, 1, 0 });
 	return 0;
 }
@@ -670,7 +670,7 @@ static int route_library(int c, const char* hdr, const struct user* u, int head_
 	struct json j;
 	struct library view;
 
-	LOG(verbose_log, "HTTP", "Route              /library");
+	LOG_FIELD(verbose_log, "HTTP", "Route", "/library");
 	(void)pthread_mutex_lock(&lib_lock);
 	memset(&view, 0, sizeof(view));
 
@@ -702,13 +702,13 @@ static int route_library(int c, const char* hdr, const struct user* u, int head_
 			free(view.items);
 
 		(void)pthread_mutex_unlock(&lib_lock);
-		LOG(verbose_log, "JSON", "Encode     FAILED");
+		LOG_FIELD(verbose_log, "JSON", "Encode", "FAILED");
 		reply(c, hdr, &(struct response){ HTTP_500, HTTP_TEXT, NULL, "JSON Encode Failed\n", sizeof("JSON Encode Failed\n") - 1, 1, 0 });
 		return -1;
 	}
 
 	(void)pthread_mutex_unlock(&lib_lock);
-	LOG(verbose_log, "JSON", "Encoded bytes      %zu bytes", j.len);
+	LOG_FIELD(verbose_log, "JSON", "Encoded bytes", "%zu bytes", j.len);
 	reply(c, hdr, &(struct response){ HTTP_200, HTTP_JSON, NULL, j.buf, j.len, !head_only, 0 });
 	json_free(&j);
 
@@ -742,7 +742,7 @@ static int route_method(int c, const char* hdr, const char* method, int* head_on
 		return 1;
 	}
 
-	LOG(verbose_log, "HTTP", "Method forbidden   %s", method);
+	LOG_FIELD(verbose_log, "HTTP", "Method forbidden", "%s", method);
 	reply(c, hdr, &(struct response){ HTTP_405, HTTP_TEXT, NULL, "Method Not Allowed\n", sizeof("Method Not Allowed\n") - 1, 1, 0 });
 	return 1;
 }
@@ -763,19 +763,19 @@ static int route_rescan(int c, const char* hdr, const struct user* u)
 	size_t before = 0;
 	size_t after = 0;
 
-	LOG(verbose_log, "HTTP", "Route              /rescan");
+	LOG_FIELD(verbose_log, "HTTP", "Route", "/rescan");
 	if (users.len == 0) {
-		LOG(true, "HTTP", "Rescan forbidden   Auth disabled");
+		LOG_FIELD(true, "HTTP", "Rescan forbidden", "Auth disabled");
 		reply(c, hdr, &(struct response){ HTTP_403, HTTP_TEXT, NULL, "Forbidden\n", sizeof("Forbidden\n") - 1, 1, 0 });
 		return 0;
 	}
 
-	LOG(true, "SCAN", "Rescan requested   %s", u->name);
+	LOG_FIELD(true, "SCAN", "Rescan requested", "%s", u->name);
 	clock_gettime(CLOCK_MONOTONIC, &t0);
 
 	(void)pthread_mutex_lock(&lib_lock);
 	before = lib.len;
-	LOG(verbose_log, "SCAN", "Rescan begin       %s (%zu items)", media_dir, before);
+	LOG_FIELD(verbose_log, "SCAN", "Rescan begin", "%s (%zu items)", media_dir, before);
 	int ok = scan_library_rescan(&lib, media_dir);
 	after = lib.len;
 	(void)pthread_mutex_unlock(&lib_lock);
@@ -784,12 +784,12 @@ static int route_rescan(int c, const char* hdr, const struct user* u)
 	long ms = (t1.tv_sec - t0.tv_sec) * 1000L + (t1.tv_nsec - t0.tv_nsec) / 1000000L;
 
 	if (ok < 0) {
-		LOG(true, "SCAN", "Rescan FAILED      %s (%ld ms)", media_dir, ms);
+		LOG_FIELD(true, "SCAN", "Rescan FAILED", "%s (%ld ms)", media_dir, ms);
 		reply(c, hdr, &(struct response){ HTTP_500, HTTP_TEXT, NULL, "Rescan Failed\n", sizeof("Rescan Failed\n") - 1, 1, 0 });
 		return -1;
 	}
 
-	LOG(true, "SCAN", "Rescan OK          %zu -> %zu (%ld ms)", before, after, ms);
+	LOG_FIELD(true, "SCAN", "Rescan OK", "%zu -> %zu (%ld ms)", before, after, ms);
 	reply(c, hdr, &(struct response){ HTTP_200, HTTP_TEXT, NULL, "OK\n", sizeof("OK\n") - 1, 1, 0 });
 	return 0;
 }
@@ -834,7 +834,7 @@ static int stream_file(int c, const struct item* it, const char* hdr, int head_o
 
 	/* build absolute path */
 	if (join_path(full, sizeof(full), media_dir, it->path) < 0) {
-		LOG(verbose_log, "HTTP", "Stream FAILED      Path too long");
+		LOG_FIELD(verbose_log, "HTTP", "Stream FAILED", "Path too long");
 		reply(c, hdr, &(struct response){ HTTP_500, HTTP_TEXT, NULL, "Server Error\n", sizeof("Server Error\n") - 1, 1, 0 });
 		return -1;
 	}
@@ -842,7 +842,7 @@ static int stream_file(int c, const struct item* it, const char* hdr, int head_o
 	/* open file */
 	int fd = open(full, O_RDONLY);
 	if (fd < 0) {
-		LOG(verbose_log, "HTTP", "Open FAILED        %s", it->path);
+		LOG_FIELD(verbose_log, "HTTP", "Open FAILED", "%s", it->path);
 		reply(c, hdr, &(struct response){ HTTP_404, HTTP_TEXT, NULL, "Not Found\n", sizeof("Not Found\n") - 1, 1, 0 });
 		return 0;
 	}
@@ -947,9 +947,9 @@ static int stream_file(int c, const struct item* it, const char* hdr, int head_o
 		close(fd);
 
 		if (partial == RANGE_OK)
-			LOG(verbose_log, "HTTP", "Header             %s [%zu-%zu/%zu]", it->path, start, end, total);
+			LOG_FIELD(verbose_log, "HTTP", "Header", "%s [%zu-%zu/%zu]", it->path, start, end, total);
 		else
-			LOG(verbose_log, "HTTP", "Header             %s (%zu bytes)", it->path, total);
+			LOG_FIELD(verbose_log, "HTTP", "Header", "%s (%zu bytes)", it->path, total);
 
 		return 0;
 	}
@@ -982,9 +982,9 @@ static int stream_file(int c, const struct item* it, const char* hdr, int head_o
 	close(fd);
 
 	if (partial == RANGE_OK)
-		LOG(verbose_log, "HTTP", "Streamed           %s [%zu-%zu/%zu]", it->path, start, end, total);
+		LOG_FIELD(verbose_log, "HTTP", "Streamed", "%s [%zu-%zu/%zu]", it->path, start, end, total);
 	else
-		LOG(verbose_log, "HTTP", "Streamed           %s (%zu bytes)", it->path, total);
+		LOG_FIELD(verbose_log, "HTTP", "Streamed", "%s (%zu bytes)", it->path, total);
 
 	return 0;
 }
@@ -1003,7 +1003,7 @@ int http_handle(int c)
 		reply(c, hdr, &(struct response){ HTTP_400, HTTP_TEXT, NULL, "Bad Request\n", sizeof("Bad Request\n") - 1, 1, 0 });
 		return -1;
 	}
-	LOG(verbose_log, "HTTP", "Request            %s %s", method, path);
+	LOG_FIELD(verbose_log, "HTTP", "Request", "%s %s", method, path);
 
 	int head_only = 0;
 	if (route_method(c, hdr, method, &head_only) != 0)

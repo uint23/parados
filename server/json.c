@@ -51,7 +51,7 @@ static int json_grow(struct json* j, size_t need)
 
 	char* nb = realloc(j->buf, ncap);
 	if (!nb) {
-		LOG(verbose_log, "JSON", "realloc FAILED     OOM");
+		LOG_FIELD(verbose_log, "JSON", "realloc FAILED", "OOM");
 		return -1;
 	}
 

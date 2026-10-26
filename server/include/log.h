@@ -70,9 +70,9 @@ static inline void log_print(bool verbose, const char* tag,
 
 	log_vprint(verbose, tag,
 #if defined(DEBUG)
-			file, line, func,
+		file, line, func,
 #endif
-			fmt, ap);
+		fmt, ap);
 
 	va_end(ap);
 }
@@ -91,6 +91,10 @@ static inline void log_print(bool verbose, const char* tag,
 #define LOG(verbose_log, tag, fmt, ...) \
 	log_print((verbose_log), (tag), (fmt), ##__VA_ARGS__)
 #endif
+
+/* Align a label before a printf-style message. */
+#define LOG_FIELD(verbose, tag, label, fmt, ...) \
+	LOG((verbose), (tag), "%-24s " fmt, (label), ##__VA_ARGS__)
 
 #endif /* LOG_H */
 
