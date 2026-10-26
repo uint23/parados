@@ -23,13 +23,8 @@ int http_io_timeout = 5;
 int max_clients = 64;
 int auth_delay = 250;
 
-/**
- * @brief Load configuration from a file path
- *
- * @param path Path to config file
- *
- * @return 0=Success, -1=Failure
- */
+/* Load configuration from a file path
+   Returns 0=Success, -1=Failure */
 static int load_path(const char* path)
 {
 	FILE* f = fopen(path, "r");
@@ -69,14 +64,8 @@ static int load_path(const char* path)
 	return 0;
 }
 
-/**
- * @brief Parse bool string value
- *
- * @param s Input string
- * @param out Output bool
- *
- * @return 0=Success, -1=Failure
- */
+/* Parse bool string value
+   Returns 0=Success, -1=Failure */
 static int parse_bool(const char* s, bool* out)
 {
 	if (!s || !out)
@@ -92,14 +81,8 @@ static int parse_bool(const char* s, bool* out)
 	return 0;
 }
 
-/**
- * @brief Apply a config key/value pair
- *
- * @param k Config key
- * @param v Config value
- *
- * @return 0=Success, -1=Failure
- */
+/* Apply a config key/value pair
+   Returns 0=Success, -1=Failure */
 static int set_kv(const char* k, const char* v)
 {
 	/* regular */
@@ -224,13 +207,8 @@ static int set_kv(const char* k, const char* v)
 	return 0;
 }
 
-/**
- * @brief Trim leading and trailing whitespace
- *
- * @param s Input string
- *
- * @return Ptr to trimmed string
- */
+/* Trim leading and trailing whitespace
+   Returns Ptr to trimmed string */
 static char* trim(char* s)
 {
 	while (*s && (*s == ' ' || *s == '\t' || *s == '\r' || *s == '\n'))

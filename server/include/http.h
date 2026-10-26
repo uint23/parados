@@ -33,15 +33,9 @@ enum {
 	LISTEN_BACKLOG = 64,
 };
 
-/**
- * @brief Handle a single HTTP request connected socket
- *
- * @note This does not close the socket
- *
- * @param c Connected client socket file descriptor
- *
- * @return 0=Handled (includes sending error responses), -1=Internal Server Error
- */
+/* Handle a single HTTP request connected socket
+   This does not close the socket
+   Returns 0=Handled (includes sending error responses), -1=Internal Server Error */
 int http_handle(int c);
 
 #endif /* HTTP_H */

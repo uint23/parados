@@ -55,9 +55,7 @@ pthread_mutex_t lib_lock;
 static pthread_mutex_t slots_lock;
 static int slots_available;
 
-/**
- * @brief Apply process resource limits
- */
+/* Apply process resource limits */
 static void apply_rlimits(void)
 {
 	struct rlimit rl;
@@ -71,11 +69,7 @@ static void apply_rlimits(void)
 	(void)setrlimit(RLIMIT_NOFILE, &rl);
 }
 
-/**
- * @brief Handle a single accepted client connection
- *
- * @param arg Client socket cast through void*
- */
+/* Handle a single accepted client connection */
 static void* client_thread(void* arg)
 {
 	int c = (int)(intptr_t)arg;
@@ -89,11 +83,7 @@ static void* client_thread(void* arg)
 	return NULL;
 }
 
-/**
- * @brief Set close on exec on file descriptor
- *
- * @param fd File descriptor
- */
+/* Set close on exec on file descriptor */
 static void fd_set_cloexec(int fd)
 {
 	int f = fcntl(fd, F_GETFD);
@@ -101,11 +91,7 @@ static void fd_set_cloexec(int fd)
 		(void)fcntl(fd, F_SETFD, f | FD_CLOEXEC);
 }
 
-/**
- * @brief Apply configured socket IO timeouts
- *
- * @param fd File descriptor
- */
+/* Apply configured socket IO timeouts */
 static void sock_set_timeouts(int fd)
 {
 	struct timeval tv;
@@ -116,9 +102,7 @@ static void sock_set_timeouts(int fd)
 	(void)setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
 }
 
-/**
- * @brief Release one client slot back to the pool
- */
+/* Release one client slot back to the pool */
 static void release_slot(void)
 {
 	if (pthread_mutex_lock(&slots_lock) != 0)
@@ -130,11 +114,8 @@ static void release_slot(void)
 	(void)pthread_mutex_unlock(&slots_lock);
 }
 
-/**
- * @brief Try to reserve one client slot
- *
- * @return 1=Acquired, 0=Full, -1=Failure
- */
+/* Try to reserve one client slot
+   Returns 1=Acquired, 0=Full, -1=Failure */
 static int try_acquire_slot(void)
 {
 	int ok = 0;

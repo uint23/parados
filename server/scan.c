@@ -17,13 +17,8 @@ static uint64_t encode_fnv1a64(const char* s);
 static int library_push(struct library* l, const char* rel);
 static int scan_dir(struct library* l, const char* root, const char* rel);
 
-/**
- * @brief Encode string using FNV1a64
- *
- * @param s Input string
- *
- * @return 64bit hash value
- */
+/* Encode string using FNV1a64
+   Returns a 64bit hash value */
 static uint64_t encode_fnv1a64(const char* s)
 {
 	/* standard fnv1a64 encoding */
@@ -37,14 +32,8 @@ static uint64_t encode_fnv1a64(const char* s)
 	return h;
 }
 
-/**
- * @brief Append item path to library
- *
- * @param l Output library
- * @param rel Relative item path
- *
- * @return 0=Success, -1=Failure
- */
+/* Append item path to library
+   Returns 0=Success, -1=Failure */
 static int library_push(struct library* l, const char* rel)
 {
 	if (l->len == l->cap) {
@@ -69,15 +58,8 @@ static int library_push(struct library* l, const char* rel)
 	return 0;
 }
 
-/**
- * @brief Recursively scan one directory subtree
- *
- * @param l Output library
- * @param root Media root directory
- * @param rel Relative path within root
- *
- * @return 0=Success, -1=Failure
- */
+/* Recursively scan one directory subtree
+   Returns 0=Success, -1=Failure */
 static int scan_dir(struct library* l, const char* root, const char* rel)
 {
 	char full[4096];

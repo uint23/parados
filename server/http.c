@@ -53,11 +53,8 @@ static int stream_file(int c, const struct item* it, const char* hdr, int head_o
 extern struct library lib;
 extern pthread_mutex_t lib_lock;
 
-/**
- * @brief Sleep for configured auth delay
- *
- * @note Retries on EINTR.
- */
+/* Sleep for configured auth delay
+   Retries on EINTR. */
 static void auth_delay_sleep(void)
 {
 	if (auth_delay <= 0)
@@ -77,13 +74,8 @@ static void auth_delay_sleep(void)
 	}
 }
 
-/**
- * @brief Check whether origin is allowed by CORS config
- *
- * @param origin Request Origin header value
- *
- * @return 1=Allowed, 0=Not allowed
- */
+/* Check whether origin is allowed by CORS config
+   Returns 1=Allowed, 0=Not allowed */
 static int cors_origin_allowed(const char* origin)
 {
 	if (cors_origin[0] == '\0')
@@ -117,16 +109,8 @@ static int cors_origin_allowed(const char* origin)
 	return 0;
 }
 
-/**
- * @brief Build CORS response headers
- *
- * @param out Output buffer
- * @param outsz Output buffer size
- * @param hdr Request header block
- * @param preflight Whether this is a preflight response
- *
- * @return 1=Built, 0=Not emitted
- */
+/* Build CORS response headers
+   Returns 1=Built, 0=Not emitted */
 static int cors_build(char* out, size_t outsz, const char* hdr, int preflight)
 {
 	char origin[512];
@@ -179,13 +163,8 @@ static int cors_build(char* out, size_t outsz, const char* hdr, int preflight)
 	return 1;
 }
 
-/**
- * @brief Find library item by id
- *
- * @param id Item id
- *
- * @return Item Ptr=Found, NULL=Not found
- */
+/* Find library item by id
+   Returns Item Ptr=Found, NULL=Not found */
 static const struct item* find_item(uint64_t id)
 {
 	for (size_t i = 0; i < lib.len; i++)
@@ -195,15 +174,8 @@ static const struct item* find_item(uint64_t id)
 	return NULL;
 }
 
-/**
- * @brief Resolve relative item path for a given id
- *
- * @param out Output path buffer
- * @param id Item id
- * @param u Authenticated user filter
- *
- * @return 0=Success, 1=Not found, -1=Failure
- */
+/* Resolve relative item path for a given id
+   Returns 0=Success, 1=Not found, -1=Failure */
 static int item_path_for_id(char out[4096], uint64_t id, const struct user* u)
 {
 	int ret = -1;
@@ -238,13 +210,8 @@ out:
 	return ret; /* 0 ok, 1 not found, -1 error */
 }
 
-/**
- * @brief Infer MIME type from file path extension
- *
- * @param path File path
- *
- * @return MIME type string
- */
+/* Infer MIME type from file path extension
+   Returns MIME type string */
 static const char* mime_from_path(const char* path)
 {
 	static const struct {
@@ -286,14 +253,8 @@ static const char* mime_from_path(const char* path)
 	return "application/octet-stream";
 }
 
-/**
- * @brief Parse 16-digit hex string to uint64
- *
- * @param s Input string
- * @param out Output value
- *
- * @return 0=Success, -1=Failure
- */
+/* Parse 16-digit hex string to uint64
+   Returns 0=Success, -1=Failure */
 static int parse_hex64(const char* s, uint64_t* out)
 {
 	if (!s || !out)
@@ -318,16 +279,8 @@ static int parse_hex64(const char* s, uint64_t* out)
 	return 0;
 }
 
-/**
- * @brief Parse HTTP Range header
- *
- * @param hdr Request header block
- * @param total Total file size in bytes
- * @param start Output start offset
- * @param end Output end offset
- *
- * @return RANGE_NONE=No header, RANGE_OK=Valid range, RANGE_BAD=Malformed, RANGE_UNSAT=Unsatisfiable
- */
+/* Parse HTTP Range header
+   Returns RANGE_NONE=No header, RANGE_OK=Valid range, RANGE_BAD=Malformed, RANGE_UNSAT=Unsatisfiable */
 static int parse_range(const char* hdr, size_t total, size_t* start, size_t* end)
 {
 	const char* p = cistrstr(hdr, "\nrange:");
@@ -413,19 +366,8 @@ static int parse_range(const char* hdr, size_t total, size_t* start, size_t* end
 	return RANGE_OK;
 }
 
-/**
- * @brief Read and parse a single HTTP request
- *
- * @param c Connected client socket file descriptor
- * @param method Output method buffer
- * @param msz Method buffer size
- * @param path Output path buffer
- * @param psz Path buffer size
- * @param hdr Output raw header buffer
- * @param hsz Header buffer size
- *
- * @return 0=Success, -1=Failure
- */
+/* Read and parse a single HTTP request
+   Returns 0=Success, -1=Failure */
 static int read_request(int c, char* method, size_t msz, char* path, size_t psz, char* hdr, size_t hsz)
 {
 	size_t used = 0;
@@ -466,13 +408,7 @@ static int read_request(int c, char* method, size_t msz, char* path, size_t psz,
 	return 0;
 }
 
-/**
- * @brief Send HTTP response header and optional body
- *
- * @param c Connected client socket file descriptor
- * @param hdr Request header block
- * @param res Response descriptor
- */
+/* Send HTTP response header and optional body */
 static void reply(int c, const char* hdr, const struct response* res)
 {
 	char resp[HTTP_RESP_MAX];
@@ -521,17 +457,8 @@ static void reply(int c, const char* hdr, const struct response* res)
 		(void)write_all(c, res->body, res->len);
 }
 
-/**
- * @brief Dispatch request path to route handler
- *
- * @param c Connected client socket file descriptor
- * @param hdr Request header block
- * @param path Request path
- * @param u Authenticated user filter
- * @param head_only Whether request method is HEAD
- *
- * @return 0=Handled, -1=Failure
- */
+/* Dispatch request path to route handler
+   Returns 0=Handled, -1=Failure */
 static int route_dispatch(int c, const char* hdr, const char* path, const struct user* u, int head_only)
 {
 	if (strcmp(path, "/ping") == 0) {
@@ -595,18 +522,8 @@ static int route_dispatch(int c, const char* hdr, const char* path, const struct
 	return 0;
 }
 
-/**
- * @brief Parse route id and resolve to an item
- *
- * @param it Output item
- * @param path Request path
- * @param prefix Route prefix
- * @param u Authenticated user filter
- * @param c Connected client socket file descriptor
- * @param hdr Request header block
- *
- * @return 0=Success, 1=Response sent, -1=Failure
- */
+/* Parse route id and resolve to an item
+   Returns 0=Success, 1=Response sent, -1=Failure */
 static int route_item_path(struct item* it, const char* path, const char* prefix, const struct user* u, int c, const char* hdr)
 {
 	uint64_t id;
@@ -655,16 +572,8 @@ static int route_item_path(struct item* it, const char* path, const char* prefix
 	return 0;
 }
 
-/**
- * @brief Handle /library route
- *
- * @param c Connected client socket file descriptor
- * @param hdr Request header block
- * @param u Authenticated user filter
- * @param head_only Whether request method is HEAD
- *
- * @return 0=Handled, -1=Failure
- */
+/* Handle /library route
+   Returns 0=Handled, -1=Failure */
 static int route_library(int c, const char* hdr, const struct user* u, int head_only)
 {
 	struct json j;
@@ -717,16 +626,8 @@ static int route_library(int c, const char* hdr, const struct user* u, int head_
 	return 0;
 }
 
-/**
- * @brief Handle request method and OPTIONS
- *
- * @param c Connected client socket file descriptor
- * @param hdr Request header block
- * @param method HTTP method
- * @param head_only Output HEAD flag
- *
- * @return 0=Continue, 1=Response sent
- */
+/* Handle request method and OPTIONS
+   Returns 0=Continue, 1=Response sent */
 static int route_method(int c, const char* hdr, const char* method, int* head_only)
 {
 	if (strcmp(method, "GET") == 0) {
@@ -747,15 +648,8 @@ static int route_method(int c, const char* hdr, const char* method, int* head_on
 	return 1;
 }
 
-/**
- * @brief Handle /rescan route
- *
- * @param c Connected client socket file descriptor
- * @param hdr Request header block
- * @param u Authenticated user
- *
- * @return 0=Handled, -1=Failure
- */
+/* Handle /rescan route
+   Returns 0=Handled, -1=Failure */
 static int route_rescan(int c, const char* hdr, const struct user* u)
 {
 	struct timespec t0;
@@ -794,14 +688,8 @@ static int route_rescan(int c, const char* hdr, const struct user* u)
 	return 0;
 }
 
-/**
- * @brief Stat media item on disk
- *
- * @param it Library item
- * @param st Output stat buffer
- *
- * @return 0=Success, -1=Failure
- */
+/* Stat media item on disk
+   Returns 0=Success, -1=Failure */
 static int stat_item(const struct item* it, struct stat* st)
 {
 	char full[4096];
@@ -818,16 +706,8 @@ static int stat_item(const struct item* it, struct stat* st)
 	return 0;
 }
 
-/**
- * @brief Stream item file to HTTP client
- *
- * @param c Connected client socket file descriptor
- * @param it Library item
- * @param hdr Request header block
- * @param head_only Whether request method is HEAD
- *
- * @return 0=Handled, -1=Failure
- */
+/* Stream item file to HTTP client
+   Returns 0=Handled, -1=Failure */
 static int stream_file(int c, const struct item* it, const char* hdr, int head_only)
 {
 	char full[4096];

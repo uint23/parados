@@ -15,14 +15,8 @@ static int b64_val(int c);
 static int ct_equal(const char* a, const char* b);
 static const struct user* find_user(const char* name);
 
-/**
- * @brief Append allow prefix to user entry
- *
- * @param u User entry
- * @param s Allow prefix string
- *
- * @return 0=Success, -1=Failure
- */
+/* Append allow prefix to user entry
+   Returns 0=Success, -1=Failure */
 static int allow_push(struct user* u, const char* s)
 {
 	if (u->allow_len == u->allow_cap) {
@@ -43,15 +37,8 @@ static int allow_push(struct user* u, const char* s)
 	return 0;
 }
 
-/**
- * @brief Decode base64 string
- *
- * @param out Output buffer
- * @param outsz Output buffer size
- * @param in Input base64 string
- *
- * @return 0=Success, -1=Failure
- */
+/* Decode base64 string
+   Returns 0=Success, -1=Failure */
 static int b64_decode(unsigned char* out, size_t outsz, const char* in)
 {
 	size_t olen = 0;
@@ -85,13 +72,8 @@ static int b64_decode(unsigned char* out, size_t outsz, const char* in)
 	return 0;
 }
 
-/**
- * @brief Map base64 byte to sextet value
- *
- * @param c Input byte
- *
- * @return 0..63=Value, -2=Padding, -1=Invalid
- */
+/* Map base64 byte to sextet value
+   Returns 0..63=Value, -2=Padding, -1=Invalid */
 static int b64_val(int c)
 {
 	if (c >= 'A' && c <= 'Z')
@@ -109,14 +91,8 @@ static int b64_val(int c)
 
 	return -1;
 }
-/**
- * @brief Compare two strings in constant time
- *
- * @param a Left string
- * @param b Right string
- *
- * @return 1=Equal, 0=Not equal
- */
+/* Compare two strings in constant time
+   Returns 1=Equal, 0=Not equal */
 static int ct_equal(const char* a, const char* b)
 {
 	size_t la = strlen(a);
@@ -134,13 +110,8 @@ static int ct_equal(const char* a, const char* b)
 	return (diff == 0) && (la == lb);
 }
 
-/**
- * @brief Find user by name
- *
- * @param name Username
- *
- * @return User Ptr=Found, NULL=Not found
- */
+/* Find user by name
+   Returns User Ptr=Found, NULL=Not found */
 static const struct user* find_user(const char* name)
 {
 	for (size_t i = 0; i < users.len; i++)
@@ -150,14 +121,8 @@ static const struct user* find_user(const char* name)
 	return NULL;
 }
 
-/**
- * @brief Check whether path matches allow prefix
- *
- * @param path Relative media path
- * @param pre Allow prefix
- *
- * @return 1=Match, 0=No match
- */
+/* Check whether path matches allow prefix
+   Returns 1=Match, 0=No match */
 static int prefix_ok(const char* path, const char* pre)
 {
 	size_t n = strlen(pre);

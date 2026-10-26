@@ -8,15 +8,8 @@
 
 static int ci_key_match(const char* a, const char* b, size_t n);
 
-/**
- * @brief Compare two header keys case-insensitively
- *
- * @param a Left string
- * @param b Right string
- * @param n Number of bytes to compare
- *
- * @return 1=Match, 0=No match
- */
+/* Compare two header keys case-insensitively
+   Returns 1=Match, 0=No match */
 static int ci_key_match(const char* a, const char* b, size_t n)
 {
 	for (size_t i = 0; i < n; i++) {
